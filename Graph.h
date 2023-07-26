@@ -6,6 +6,6 @@
 
 using namespace std;
 class Graph{
-    map<string, vector<string, double>> songs;
+    map<string, vector<string, double>> popSongs;
 };
 #endif //PROJECT3_GRAPH_H
