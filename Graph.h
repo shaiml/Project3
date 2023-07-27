@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 class Graph{
@@ -27,4 +29,9 @@ public:
     // danceability, energy, tempo, genre, song_name
 
 };
+
+void Graph::ReadFile() {
+    fstream spotify;
+    spotify.open("spotify_dataset.csv", ios::out | ios::app);
+}
 #endif //PROJECT3_GRAPH_H
