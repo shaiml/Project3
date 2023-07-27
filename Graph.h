@@ -22,5 +22,9 @@ class Graph{
     map<string, vector<string, double>> dnb;
     map<string, vector<string, double>> hardstyle;
 
+public:
+    void ReadFile();
+    // danceability, energy, tempo, genre, song_name
+
 };
 #endif //PROJECT3_GRAPH_H
