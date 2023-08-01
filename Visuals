@@ -35,8 +35,11 @@ int main() {
     titleText.setString("Create Your Playlist!");
     titleText.setStyle(sf::Text::Underlined);
     titleText.setCharacterSize(90);
-    titleText.setPosition(width / 2.0f + 50, height / 4.0f - 175);
+    titleText.setPosition(width / 2.0f + 50, height / 4.0f - 200);
     titleText.setFillColor(sf::Color::Black);
+
+    sf::FloatRect titleRect = titleText.getLocalBounds();
+    titleText.setOrigin(titleRect.left + titleRect.width/2.0f, titleRect.top  + titleRect.height/2.0f);
 
     sf::Text filterText;
     filterText.setFont(semiBold);
@@ -49,7 +52,7 @@ int main() {
     genreText.setFont(otherPixel);
     genreText.setString("Select Your Genre");
     genreText.setCharacterSize(50);
-    genreText.setPosition(width / 3.0f - 50, height / 4.0f - 70);
+    genreText.setPosition(width / 3.0f - 50, height / 4.0f - 100);
     genreText.setFillColor(sf::Color::Black);
 
     vector<sf::Text> textBoxes;
@@ -59,32 +62,50 @@ int main() {
     darkTrap.setPosition(width / 9.0f - 50, height / 4.0f + 10);
     textBoxes.push_back(darkTrap);
 
-    sf::Text underGround;
-    text.setText(underGround, otherPixel, "Underground", 40, sf::Color::Black);
-    underGround.setPosition(width / 3.0f + 100, height / 4.0f + 10);
-    textBoxes.push_back(underGround);
+    sf::Text hipHop;
+    text.setText(hipHop, otherPixel, "Hip-Hop", 40, sf::Color::Black);
+    hipHop.setPosition(width / 3.0f, height / 4.0f + 10);
+    textBoxes.push_back(hipHop);
+
+    sf::Text emo;
+    text.setText(emo, otherPixel, "Emo", 40, sf::Color::Black);
+    emo.setPosition(width / 2.0f + 125, height / 4.0f + 10);
+    textBoxes.push_back(emo);
 
     sf::Text trapMetal;
     text.setText(trapMetal, otherPixel, "Trap Metal", 40, sf::Color::Black);
     trapMetal.setPosition(width / 2.0f + 350, height / 4.0f + 10);
     textBoxes.push_back(trapMetal);
 
+    sf::Text rap;
+    text.setText(rap, otherPixel, "Rap", 40, sf::Color::Black);
+    rap.setPosition(width / 9.0f - 50, height / 3.0f - 20);
+    textBoxes.push_back(rap);
 
-    sf::FloatRect titleRect = titleText.getLocalBounds();
-    titleText.setOrigin(titleRect.left + titleRect.width/2.0f, titleRect.top  + titleRect.height/2.0f);
+    sf::Text underGround;
+    text.setText(underGround, otherPixel, "Underground", 40, sf::Color::Black);
+    underGround.setPosition(width / 3.0f - 50, height / 3.0f - 20);
+    textBoxes.push_back(underGround);
 
+    sf::Text rnb;
+    text.setText(rnb, otherPixel, "RNB", 40, sf::Color::Black);
+    rnb.setPosition(width / 2.0f + 125, height / 3.0f - 20);
+    textBoxes.push_back(rnb);
+
+    sf::Text pop;
+    text.setText(pop, otherPixel, "Pop", 40, sf::Color::Black);
+    pop.setPosition(width / 2.0f + 355, height / 3.0f - 20);
+    textBoxes.push_back(pop);
+
+    sf::RectangleShape outline;
+    outline.setFillColor(sf::Color::Transparent);
+    outline.setOutlineThickness(4.f);
+    outline.setOutlineColor(sf::Color::Green);
 
     sf::Sprite headphones;
     headphones.setScale(.20f, .20f);
     headphones.setTexture(TextureManager::GetTexture("headphones"));
-    headphones.setPosition(width / 8.0f - 30, height / 5.0f - 150);
-
-    sf::Sprite filter;
-    filter.setScale(.08f, .08f);
-    filter.setTexture(TextureManager::GetTexture("filter"));
-    filter.setPosition(width / 9.0f - 30, height / 4.0f - 50);
-
-
+    headphones.setPosition(width / 8.0f - 30, height / 5.0f - 175);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -96,7 +117,15 @@ int main() {
         window.draw(titleText);
         window.draw(genreText);
         for (auto i: textBoxes) {
-            window.draw(i);
+            if (i.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)))) {
+                outline.setSize(sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
+                outline.setPosition(i.getPosition() - sf::Vector2f(4.f, 4.f));
+                window.draw(i);
+                window.draw(outline);
+            }
+            else {
+                window.draw(i);
+            }
         }
         window.draw(headphones);
         window.display();
