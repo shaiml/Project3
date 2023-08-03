@@ -41,6 +41,8 @@ void Text::genreOutLineFunction(sf::RenderWindow &window, sf::Event event) {
         outline.setPosition(selected.getPosition() - sf::Vector2f(4.f, 4.f));
         window.draw(outline);
     }
+    sf::String sfString = selected.getString();
+    genre = sfString.toAnsiString();  // save selected genre
 }
 
 void Text::typeOutlineFunction(sf::RenderWindow &window, sf::Event event) {
@@ -54,8 +56,7 @@ void Text::typeOutlineFunction(sf::RenderWindow &window, sf::Event event) {
     for (const auto& i: typeBoxes) {
         window.draw(i);
         if (i.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))) && !selectedScale) {
-            outline.setSize(
-                    sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
+            outline.setSize(sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
             outline.setPosition(i.getPosition() - sf::Vector2f(4.f, 4.f));
             window.draw(outline);
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -78,6 +79,8 @@ void Text::typeOutlineFunction(sf::RenderWindow &window, sf::Event event) {
         outline.setPosition(typeSelected.getPosition() - sf::Vector2f(4.f, 4.f));
         window.draw(outline);
     }
+    sf::String sfString = typeSelected.getString();
+    this->type = sfString.toAnsiString();  // save playlist type
 }
 
 void Text::energyOutlineFunction(sf::RenderWindow &window, sf::Event event) {
@@ -86,9 +89,7 @@ void Text::energyOutlineFunction(sf::RenderWindow &window, sf::Event event) {
     outline.setOutlineThickness(4.f);
     outline.setOutlineColor(sf::Color::Green);
 
-    sf::Text &selected = scaleBoxes[0];
-
-    for (const auto& i: scaleBoxes) {
+    for (auto i: scaleBoxes) {
         window.draw(i);
         if (i.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))) && !selectedScale) {
             outline.setSize(sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
@@ -98,8 +99,8 @@ void Text::energyOutlineFunction(sf::RenderWindow &window, sf::Event event) {
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                 if (scaleMousePress) {
                     if (i.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        typeSelected = i;
                         selectedScale = true;
-                        selected = i;
                     }
                     scaleMousePress = false;
                 }
@@ -110,8 +111,46 @@ void Text::energyOutlineFunction(sf::RenderWindow &window, sf::Event event) {
     }
 
     if (selectedScale) { // if genre selected continue display outline
-        outline.setSize(sf::Vector2f(selected.getGlobalBounds().width + 20.f, selected.getGlobalBounds().height + 20.f));
-        outline.setPosition(selected.getPosition() - sf::Vector2f(4.f, 4.f));
+        outline.setSize(sf::Vector2f(typeSelected.getGlobalBounds().width + 20.f, typeSelected.getGlobalBounds().height + 20.f));
+        outline.setPosition(typeSelected.getPosition() - sf::Vector2f(4.f, 4.f));
+        window.draw(outline);
+    }
+
+//    sf::String sfString = typeSelected.getString();
+//    cout << sfString.toAnsiString() << endl;  // save playlist type
+
+}
+
+
+void Text::rangeOutlineFunction(sf::RenderWindow &window, sf::Event event) {
+    sf::RectangleShape outline;
+    outline.setFillColor(sf::Color::Transparent);
+    outline.setOutlineThickness(4.f);
+    outline.setOutlineColor(sf::Color::Green);
+
+    for (auto i: rangeBoxes) {
+        window.draw(i);
+        if (i.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))) && !selectedScaleTwo) {
+            outline.setSize(sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
+            outline.setPosition(i.getPosition() - sf::Vector2f(4.f, 4.f));
+            window.draw(outline);
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (scaleMousePressTwo) {
+                    if (i.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        typeSelectedTwo = i;
+                        selectedScaleTwo = true;
+                    }
+                    scaleMousePressTwo = false;
+                }
+            } else if (event.type == sf::Event::MouseButtonReleased) {
+                scaleMousePressTwo = true;
+            }
+        }
+    }
+    if (selectedScaleTwo) { // if genre selected continue display outline
+        outline.setSize(sf::Vector2f(typeSelectedTwo.getGlobalBounds().width + 20.f, typeSelectedTwo.getGlobalBounds().height + 20.f));
+        outline.setPosition(typeSelectedTwo.getPosition() - sf::Vector2f(4.f, 4.f));
         window.draw(outline);
     }
 }
