@@ -9,11 +9,11 @@ using namespace std;
 
 int main() {
     Text text;
+    ostringstream oss;
     float width = 1500;
     float height = 1500;
     sf::RenderWindow window(sf::VideoMode(width, height), "Beat Builders");
     sf::Color lightGreen(162, 252, 162);
-
     sf::Font pixel;
     sf::Font semiBold;
     sf::Font otherPixel;
@@ -184,8 +184,10 @@ int main() {
     dotThree.setPosition(width / 2.0f + 300, height / 2.0f + 350);
 
     int loading = 0;
+    int animationCount = 0;
     int enteredNumber;
     bool isVisible = true;
+    bool newWindow = false;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -218,10 +220,16 @@ int main() {
             else if (event.key.code == sf::Keyboard::Enter) {
                 if (enteredNumber >= 1 && enteredNumber <= 50) {
                     text.selectedAmount = true;
+//                    text.numSongs = enteredNumber;
                 }
             }
         }
-        if (isVisible) {
+        if (animationCount >= 6) {  // allow animation to run twice before window close
+            window.close();
+            newWindow = true;
+        }
+
+        if (isVisible && text.selectedAmount) {
             isVisible = false;
         }
         else {
@@ -289,6 +297,79 @@ int main() {
         }
         window.display();
         sf::sleep(sf::seconds(0.5f));  // sets animation speed
+
+        if (!isVisible) {
+            animationCount++;
+        }
+    }
+
+    vector<pair<string, double>> songTitles ({{"Wasted Times", 0.1}, {"Secrets", 0.1}, {"After Hours", 9.9}, {"Starboy", 1.0},
+                                             {"Heartless", 8.9}, {"Too Late", 2.0}, {"Hardest To Love", 8.7}, {"Escape From LA", 3.4},
+                                             {"Faith", 5.0}, {"Save Your Tears", 2.0}, {"After Hours", 0.2}, {"Call Out My Name", 2.9},
+                                             {"I Was Never There", 4.9}, {"Cruel Summer", 7.8}, {"Dawn Fm", 2.3}, {"Secrets", 4.9}});
+    int increase = 10;
+    int track = 0;
+    for (auto pair : songTitles) {
+        sf::Text songText;
+        sf::Text energyText;
+        songText.setString(pair.first);
+
+        float x = width / 8.0f;
+        float y = height / 9.0f + increase;
+        oss << fixed << setprecision(1) << pair.second;
+        string level = oss.str();
+
+        text.setText(songText, otherPixel, pair.first, 40, sf::Color::Black);
+        text.setText(energyText, semiBold, level, 40, sf::Color::Black);
+
+        oss.str("");
+        float otherX = width - 300;
+        float otherY = height / 9.0f + increase;
+
+        songText.setPosition(x, y);
+        energyText.setPosition(otherX, otherY);
+        text.storeSongs.emplace_back(songText, energyText);
+        increase += 75;
+        track++;
+        if (track > 13) {
+            increase = 10;
+            track = 0;
+        }
+    }
+
+    sf::RectangleShape songOutline;
+    songOutline.setFillColor(sf::Color::Transparent);
+    songOutline.setOutlineThickness(4.f);
+    songOutline.setOutlineColor(sf::Color::Black);
+    songOutline.setSize(sf::Vector2f(width - 150, height - 300));
+    songOutline.setPosition(width / 9.0f - 85, height / 9.0f - 100);
+
+    sf::Text songTitleText;
+    text.setText(songTitleText, pixel, "Song Title", 55, sf::Color::Black);
+    songTitleText.setStyle(sf::Text::Bold);
+    songTitleText.setPosition(width / 9.0f + 15, height / 9.0f - 80);
+
+    sf::Text energyText;
+    text.setText(energyText, pixel, "Energy Level", 55, sf::Color::Black);
+    energyText.setStyle(sf::Text::Bold);
+    energyText.setPosition(width / 2.0f + 275, height / 9.0f - 80);
+
+    if (newWindow) {
+        sf::RenderWindow resultWindow(sf::VideoMode(width, height), "Beat Builders");
+        while (resultWindow.isOpen()) {
+            sf::Event event;
+            while (resultWindow.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    resultWindow.close();
+                }
+            }
+            resultWindow.clear(lightGreen);
+            resultWindow.draw(songOutline);
+            resultWindow.draw(songTitleText);
+            resultWindow.draw(energyText);
+            text.buttonsFunction(resultWindow, event);
+            resultWindow.display();
+        }
     }
     return 0;
 }
