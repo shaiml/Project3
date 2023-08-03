@@ -1,137 +1,11 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "textures.h"
+#include "visuals.h"
 using namespace std;
-
-class Text {
-private:
-    bool mousePress = true;
-    bool otherMousePress = true;
-    bool scaleMousePress = true;
-public:
-    vector<sf::Text> genreTextBoxes;
-    vector<sf::Text> typeBoxes;
-    vector<sf::Text> scaleBoxes;
-    bool selectedGenre = false;
-    bool selectedType = false;
-    bool selectedScale = false;
-
-    void setText (sf::Text& text, sf::Font& font, const string& str, unsigned int characterSize, const sf::Color& fillColor) {
-        text.setFont(font);
-        text.setString(str);
-        text.setCharacterSize(characterSize);
-        text.setFillColor(fillColor);
-    }
-    void genreOutLineFunction (sf::RenderWindow& window, sf::Event event) {  // handles outline for genre selection
-        sf::RectangleShape outline;
-        outline.setFillColor(sf::Color::Transparent);
-        outline.setOutlineThickness(4.f);
-        outline.setOutlineColor(sf::Color::Green);
-
-        sf::Text &selected = genreTextBoxes[0]; // initializer
-
-        for (const auto &i: genreTextBoxes) {
-            window.draw(i);
-            if (i.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)))  && !selectedScale) {
-                outline.setSize(sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
-                outline.setPosition(i.getPosition() - sf::Vector2f(4.f, 4.f));
-                window.draw(i);
-                window.draw(outline);
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                    if (mousePress) {
-                        if (i.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                            selectedGenre = true;
-                            selected = i;
-                        }
-                        mousePress = false;
-                    }
-                } else if (event.type == sf::Event::MouseButtonReleased) {
-                    mousePress = true;
-                }
-            }
-        }
-        if (selectedGenre) {  // if genre selected continue display outline
-            outline.setSize(sf::Vector2f(selected.getGlobalBounds().width + 20.f, selected.getGlobalBounds().height + 20.f));
-            outline.setPosition(selected.getPosition() - sf::Vector2f(4.f, 4.f));
-            window.draw(outline);
-        }
-    }
-    void typeOutlineFunction(sf::RenderWindow& window, sf::Event event) {  // handles outline for type selection
-        sf::RectangleShape outline;
-        outline.setFillColor(sf::Color::Transparent);
-        outline.setOutlineThickness(4.f);
-        outline.setOutlineColor(sf::Color::Green);
-
-        sf::Text &typeSelected = typeBoxes[0];
-
-        for (const auto& i: typeBoxes) {
-            window.draw(i);
-            if (i.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))) && !selectedScale) {
-                outline.setSize(
-                        sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
-                outline.setPosition(i.getPosition() - sf::Vector2f(4.f, 4.f));
-                window.draw(outline);
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                    if (otherMousePress) {
-                        if (i.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                            selectedType = true;
-                            typeSelected = i;
-                        }
-                        otherMousePress = false;
-                    }
-                } else if (event.type == sf::Event::MouseButtonReleased) {
-                    otherMousePress = true;
-                }
-            }
-        }
-
-        if (selectedType) { // if genre selected continue display outline
-            outline.setSize(sf::Vector2f(typeSelected.getGlobalBounds().width + 20.f, typeSelected.getGlobalBounds().height + 20.f));
-            outline.setPosition(typeSelected.getPosition() - sf::Vector2f(4.f, 4.f));
-            window.draw(outline);
-        }
-    }
-
-    void energyOutlineFunction(sf::RenderWindow& window, sf::Event event) {
-        sf::RectangleShape outline;
-        outline.setFillColor(sf::Color::Transparent);
-        outline.setOutlineThickness(4.f);
-        outline.setOutlineColor(sf::Color::Green);
-
-        sf::Text &selected = scaleBoxes[0];
-
-        for (const auto& i: scaleBoxes) {
-            window.draw(i);
-            if (i.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))) && !selectedScale) {
-                outline.setSize(sf::Vector2f(i.getGlobalBounds().width + 20.f, i.getGlobalBounds().height + 20.f));
-                outline.setPosition(i.getPosition() - sf::Vector2f(4.f, 4.f));
-                window.draw(outline);
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                    if (scaleMousePress) {
-                        if (i.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                            selectedScale = true;
-                            selected = i;
-                        }
-                        scaleMousePress = false;
-                    }
-                } else if (event.type == sf::Event::MouseButtonReleased) {
-                    scaleMousePress = true;
-                }
-            }
-        }
-
-        if (selectedScale) { // if genre selected continue display outline
-            outline.setSize(sf::Vector2f(selected.getGlobalBounds().width + 20.f, selected.getGlobalBounds().height + 20.f));
-            outline.setPosition(selected.getPosition() - sf::Vector2f(4.f, 4.f));
-            window.draw(outline);
-        }
-    }
-};
 
 int main() {
     Text text;
@@ -232,10 +106,10 @@ int main() {
     attributes.setPosition(width / 5.0f + 35, height / 2.0f - 50);
 
     text.setText(scale, otherPixel, "(Lowest: 1 Highest: 10)", 30, sf::Color::Black);
-    scale.setPosition(width / 3.0, height / 2.0f + 25);
+    scale.setPosition(width / 3.0f, height / 2.0f + 25);
 
     text.setText(energy, otherPixel, "Energy -", 40, sf::Color::Black);
-    energy.setPosition(width / 9.0 - 50, height / 2.0f + 100);
+    energy.setPosition(width / 9.0f - 50, height / 2.0f + 100);
 
     // Levels
     sf::Text one, two, three, four, five, six, seven, eight, nine, ten, scaleReference;
@@ -250,16 +124,16 @@ int main() {
     text.setText(nine, otherPixel, "9", 40, sf::Color::Black);
     text.setText(ten, otherPixel, "10", 40, sf::Color::Black);
 
-    one.setPosition(width / 5.0 + 100, height / 2.0f + 100);
-    two.setPosition(width / 5.0 + 200, height / 2.0f + 100);
-    three.setPosition(width / 5.0 + 300, height / 2.0f + 100);
-    four.setPosition(width / 5.0 + 400, height / 2.0f + 100);
-    five.setPosition(width / 5.0 + 500, height / 2.0f + 100);
-    six.setPosition(width / 5.0 + 600, height / 2.0f + 100);
-    seven.setPosition(width / 5.0 + 700, height / 2.0f + 100);
-    eight.setPosition(width / 5.0 + 800, height / 2.0f + 100);
-    nine.setPosition(width / 5.0 + 900, height / 2.0f + 100);
-    ten.setPosition(width / 5.0 + 1000, height / 2.0f + 100);
+    one.setPosition(width / 5.0f + 100, height / 2.0f + 100);
+    two.setPosition(width / 5.0f + 200, height / 2.0f + 100);
+    three.setPosition(width / 5.0f + 300, height / 2.0f + 100);
+    four.setPosition(width / 5.0f + 400, height / 2.0f + 100);
+    five.setPosition(width / 5.0f + 500, height / 2.0f + 100);
+    six.setPosition(width / 5.0f + 600, height / 2.0f + 100);
+    seven.setPosition(width / 5.0f + 700, height / 2.0f + 100);
+    eight.setPosition(width / 5.0f + 800, height / 2.0f + 100);
+    nine.setPosition(width / 5.0f + 900, height / 2.0f + 100);
+    ten.setPosition(width / 5.0f + 1000, height / 2.0f + 100);
 
     text.setText(scaleReference, otherPixel, "", 40, sf::Color::Black);
     scaleReference.setPosition(width / 2.0f + 355, height / 3.0f - 20);
@@ -276,11 +150,29 @@ int main() {
     text.scaleBoxes.push_back(nine);
     text.scaleBoxes.push_back(ten);
 
-    // Generate PlayList
+    // Number of Songs Prompt
+    sf::Text numSongs;
+    text.setText(numSongs, otherPixel, "Enter Number of Songs (1-50): ", 50, sf::Color::Black);
+    numSongs.setStyle(sf::Text::Bold);
+    numSongs.setPosition(width / 8.0 - 75, height / 2.0f + 200);
+
+    // User Input
+    sf::Text userInput;
+    userInput.setFont(otherPixel);
+    userInput.setCharacterSize(50);
+    userInput.setPosition(width / 2.0 + 430, height / 2.0f + 235);
+    userInput.setFillColor(sf::Color::Black);
+
+    string num;
+    userInput.setString(""); // initial cursor
+    sf::FloatRect userInputRect = userInput.getLocalBounds();
+    userInput.setOrigin(userInputRect.left + userInputRect.width/2.0f, userInputRect.top  + userInputRect.height/2.0f);
+
+    // Generate PlayList Text
     sf::Text generate;
     text.setText(generate, otherPixel, "Generating Playlist", 50, sf::Color::Black);
     generate.setStyle(sf::Text::Bold);
-    generate.setPosition(width / 8.0 - 75, height / 2.0f + 300);
+    generate.setPosition(width / 8.0f - 75, height / 2.0f + 300);
 
     // Loading Dots
     window.setFramerateLimit(3);
@@ -289,18 +181,47 @@ int main() {
     text.setText(dotTwo, semiBold, ".", 100, sf::Color::Black);
     text.setText(dotThree, semiBold, ".", 100, sf::Color::Black);
 
-    dotOne.setPosition(width / 2.0 + 100, height / 2.0f + 250);
-    dotTwo.setPosition(width / 2.0 + 200, height / 2.0f + 250);
-    dotThree.setPosition(width / 2.0 + 300, height / 2.0f + 250);
+    dotOne.setPosition(width / 2.0f + 100, height / 2.0f + 250);
+    dotTwo.setPosition(width / 2.0f + 200, height / 2.0f + 250);
+    dotThree.setPosition(width / 2.0f + 300, height / 2.0f + 250);
 
     int loading = 0;
+    int enteredNumber;
     bool isVisible = true;
 
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
+            }
+            else if (event.type == sf::Event::TextEntered) { // Allow Digits and Delete or Backspace
+                if ((event.text.unicode >= 0x30 && event.text.unicode <= 0x39) || event.text.unicode == 127) {
+                    if (num.size() < 2) {
+                        num += static_cast<char>(event.text.unicode);
+                        userInput.setString(num); // Name + cursor
+                        enteredNumber = stoi(num);
+                        sf::FloatRect inputRect = userInput.getLocalBounds(); // Center text
+                        userInput.setOrigin(inputRect.left + inputRect.width / 2.0f,inputRect.top + inputRect.height / 2.0f);
+                    }
+                }
+            }
+            else if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::BackSpace) {
+                    if (!num.empty()) {
+                        num.pop_back();
+                        userInput.setString(num);
+                        // Center text
+                        sf::FloatRect inputRect = userInput.getLocalBounds();
+                        userInput.setOrigin(inputRect.left + inputRect.width/2.0f, inputRect.top  + inputRect.height/2.0f);
+                    }
+                }
+            }
+            else if (event.key.code == sf::Keyboard::Enter) {
+                if (enteredNumber >= 1 && enteredNumber <= 50) {
+                    text.selectedAmount = true;
+                }
+            }
         }
         if (isVisible) {
             isVisible = false;
@@ -309,7 +230,7 @@ int main() {
             isVisible = true;
             loading = (loading % 3) + 1;
         }
-        switch (loading) {
+        switch (loading) {  // display dots in loading sequence
             case 1:
                 dotOne.setString(".");
                 dotTwo.setString("");
@@ -332,19 +253,24 @@ int main() {
         window.draw(genreText);
         window.draw(headphones);
 
-        text.genreOutLineFunction(window, event);
+        text.genreOutLineFunction(window, event); // displays genre outline and text
 
         if (text.selectedGenre) {
             window.draw(playListType);
-            text.typeOutlineFunction(window, event);
+            text.typeOutlineFunction(window, event);  // displays playlist type outline and text
         }
         if (text.selectedType) {
             window.draw(attributes);
             window.draw(scale);
             window.draw(energy);
-            text.energyOutlineFunction(window, event);
+            text.energyOutlineFunction(window, event);  // displays energy level outline and text
         }
-        if (text.selectedScale) {
+        if (text.selectedScale) {  // displays number of songs prompt
+            window.draw(numSongs);
+            window.draw(userInput);
+        }
+
+        if (text.selectedAmount) {  // all selections made, generate playlist
             window.draw(generate);
             if (isVisible) {
                 window.draw(dotOne);
@@ -353,8 +279,7 @@ int main() {
             }
         }
         window.display();
-        sf::sleep(sf::seconds(0.5f));
+        sf::sleep(sf::seconds(0.5f));  // sets animation speed
     }
-
     return 0;
 }
