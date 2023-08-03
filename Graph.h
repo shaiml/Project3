@@ -203,6 +203,31 @@ string Graph::RandomSongHelper(map<string, vector<pair<string, double>>> &genre,
 
 vector<string> Graph::ConstantPlaylistHelper(map<string, vector<pair<string,double>>>& genre, int playlistSize, double energyLevel) {
     //BFS
+    string startSong = RandomSongHelper(genre, energyLevel);
+    vector<string> playlist;
+    set<string> visited;
+    queue<string> q;
+
+    visited.insert(startSong);
+    q.push(startSong);
+
+    while(!q.empty()){
+        string u = q.front();
+        q.pop();
+        vector<pair<string,double>> neighbors = genre[u];
+        std::sort(neighbors.begin(),neighbors.begin()+neighbors.size());
+        for(string v: neighbors)
+        {
+            if(visited.count(v)==0)
+            {
+                visited.insert(v);
+                q.push(v);
+            }
+        }
+    }
+    while(playlist.size() != playlistSize){
+
+    }
 }
 
 vector<string> Graph::RangePlaylistHelper(map<string, vector<pair<string,double>>>& genre, int length, double energy1, double energy2) {
