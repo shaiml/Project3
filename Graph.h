@@ -135,8 +135,6 @@ void Graph::ReadFile() {
 //        }
 //    }
 
-
-
 //    for (auto& entry : popGraph){
 //        string key = entry.first;
 //        cout << key << endl;
@@ -147,7 +145,7 @@ void Graph::ReadFile() {
 //            cout << songname << energy << endl;
 //        }
 //    }
-    cout<< "done" << endl;
+//    cout<< "done" << endl;
     spotify.close();
 }
 
@@ -173,7 +171,7 @@ void Graph::CreateGraph(map<string, vector<pair<string, double>>> &graph, map<st
     }
 }
 
-map<string, vector<pair<string, double>>> Graph ::CheckGenre(string genre){
+map<string, vector<pair<string, double>>> Graph ::CheckGraph(string genre){
     if (genre == "Dark Trap"){
         return darktrapGraph;
     }
@@ -197,6 +195,33 @@ map<string, vector<pair<string, double>>> Graph ::CheckGenre(string genre){
     }
     else if(genre == "Hiphop") {
         return hiphopGraph;
+    }
+}
+
+map<string, double> Graph::CheckMap(string genre){
+    if (genre == "Dark Trap"){
+        return darktrap;
+    }
+    else if(genre == "Underground Rap"){
+        return rap;
+    }
+    else if(genre == "Trap Metal"){
+        return trapmetal;
+    }
+    else if(genre == "Emo"){
+        return emo;
+    }
+    else if(genre == "Rap"){
+        return rap;
+    }
+    else if(genre == "RnB"){
+        return rnb;
+    }
+    else if(genre == "Pop"){
+        return pop;
+    }
+    else if(genre == "Hiphop") {
+        return hiphop;
     }
 }
 
@@ -227,36 +252,37 @@ string Graph::RandomSongHelper(map<string, double> &genre, double energy) {
     }
 }
 
-vector<string> Graph::ConstantPlaylistHelper(map<string, vector<pair<string,double>>>& genre, int playlistSize, double energyLevel) {
+vector<pair<string, double>> Graph::ConstantPlaylistHelper(map<string, vector<pair<string,double>>>& graph, map<string, double>& map, int playlistSize, double energy) {
     //BFS
-    string startSong = RandomSongHelper(genre, energyLevel);
-    vector<string> playlist;
-    set<string> visited;
-    queue<string> q;
+    string startSong = RandomSongHelper(map, energy); //find random song that matches energy level
+    vector<pair<string, double>> playlist; // initiate playlist of songs
+    set<string> visited; // set to check if vertex has already been visited
+    queue<string> q; //queue for vertexes
 
     visited.insert(startSong);
     q.push(startSong);
+    playlist.push_back(make_pair(q.front(), map[q.front()]));
 
-    while(!q.empty()){
+    while (playlist.size() != playlistSize) { //continue until we reach desired playlist size
         string u = q.front();
         q.pop();
-        vector<pair<string,double>> neighbors = genre[u];
-        std::sort(neighbors.begin(),neighbors.begin()+neighbors.size());
-        for(string v: neighbors)
-        {
-            if(visited.count(v)==0)
-            {
-                visited.insert(v);
-                q.push(v);
+        vector<pair<string,double>> neighbors = graph[u];
+        for (auto it = neighbors.begin(); it != neighbors.end(); it++){
+            if (visited.count(it->first) == 0 && playlist.size() != playlistSize){
+                visited.insert(it->first);
+                q.push(it->first);
+                double newEnergy = map[it->first] * 10;
+                playlist.push_back(make_pair(it->first, newEnergy));
+            }
+            if (playlist.size() == playlistSize){
+                break;
             }
         }
     }
-    while(playlist.size() != playlistSize){
-
-    }
+    return playlist;
 }
 
-vector<string> Graph::RangePlaylistHelper(map<string, vector<pair<string,double>>>& genre, int length, double energy1, double energy2) {
+vector<pair<string, double>> Graph::RangePlaylistHelper(map<string, vector<pair<string,double>>>& graph, map<string, double>& map, int playlistSize, double energy1, double energy2) {
     //DFS [randomly accessed]
     string startSong = RandomSongHelper(map, energy1);
     vector<pair<string, double>> playlist;
@@ -304,13 +330,15 @@ vector<string> Graph::RangePlaylistHelper(map<string, vector<pair<string,double>
     return playlist;
 }
 
-vector<string> Graph::CreateConstantPlaylist(string genre, int playlistSize, double energyLevel) {
-    map<string, vector<pair<string,double>>> genreGraph = CheckGenre(genre);
-    return ConstantPlaylistHelper(genreGraph, playlistSize, energyLevel);
+vector<pair<string, double>> Graph::CreateConstantPlaylist(string genre, int playlistSize, double energy) {
+    map<string, vector<pair<string,double>>> genreGraph = CheckGraph(genre);
+    map<string, double> genreMap = CheckMap(genre);
+    return ConstantPlaylistHelper(genreGraph, genreMap, playlistSize, energy);
 }
 
-vector<string> Graph::CreateRangePlaylist(string genre, int playlistSize, double energy1, double energy2) {
-    map<string, vector<pair<string,double>>> genreGraph = CheckGenre(genre);
-    return RangePlaylistHelper(genreGraph, playlistSize, energy1, energy2);
+vector<pair<string, double>> Graph::CreateRangePlaylist(string genre, int playlistSize, double energy1, double energy2) {
+    map<string, vector<pair<string,double>>> genreGraph = CheckGraph(genre);
+    map<string, double> genreMap = CheckMap(genre);
+    return RangePlaylistHelper(genreGraph, genreMap, playlistSize, energy1, energy2);
 }
 #endif //PROJECT3_GRAPH_H
