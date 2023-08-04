@@ -10,6 +10,8 @@
 #include <set>
 #include <queue>
 #include <stack>
+#include <cstdlib>
+#include <random>
 
 using namespace std;
 class Graph{
@@ -37,12 +39,13 @@ public:
     void ReadFile();
     void CreateGraph(map<string, vector<pair<string, double>>>& graph, map<string, double>& genre);
     // danceability, energy, tempo, genre, song_name
-    vector<string> CreateConstantPlaylist(string genre, int playlistSize, double energyLevel); //BFS
-    vector<string> ConstantPlaylistHelper(map<string, vector<pair<string,double>>>& genre, int playlistSize, double energyLevel);
-    vector<string> CreateRangePlaylist(string genre, int playlistSize, double energy1, double energy2); //DFS
-    vector<string> RangePlaylistHelper(map<string, vector<pair<string,double>>>& genre, int playlistSize, double energy1, double energy2);
-    map<string, vector<pair<string, double>>> CheckGenre(string genre);
-    string RandomSongHelper(map<string, vector<pair<string,double>>>& genre, double energy);
+    vector<pair<string, double>> CreateConstantPlaylist(string genre, int playlistSize, double energy); //BFS
+    vector<pair<string, double>> ConstantPlaylistHelper(map<string, vector<pair<string,double>>> &graph, map<string, double> &map, int playlistSize, double energy);
+    vector<pair<string, double>> CreateRangePlaylist(string genre, int playlistSize, double energy1, double energy2); //DFS
+    vector<pair<string, double>> RangePlaylistHelper(map<string, vector<pair<string,double>>>& graph, map<string, double>& map, int playlistSize, double energy1, double energy2);
+    map<string, vector<pair<string, double>>> CheckGraph(string genre);
+    map<string, double> CheckMap(string genre);
+    string RandomSongHelper(map<string, double> &genre, double energy);
 };
 
 
@@ -197,8 +200,31 @@ map<string, vector<pair<string, double>>> Graph ::CheckGenre(string genre){
     }
 }
 
-string Graph::RandomSongHelper(map<string, vector<pair<string, double>>> &genre, double energy) {
 
+double random(double min, double max){
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_real_distribution<double> source_energy(min, max);
+    return source_energy(gen);
+
+}
+
+// if user chooses energy level to be (whole number) x, generate a random double between x.0 and x.9
+string Graph::RandomSongHelper(map<string, double> &genre, double energy) {
+    energy = (energy - 1.0)/10.0; // changes range from 1-10 to 0.0 - 9.9 to match the dataset values
+    double min = energy;
+    double max = energy + 0.9;
+    bool found = false;
+
+    while (!found){
+        double source_energy = random(min, max);
+        for(auto it = genre.begin(); it != genre.end(); it++) {
+            if (it->second == source_energy) {
+                found = true;
+                return it->first;
+            }
+        }
+    }
 }
 
 vector<string> Graph::ConstantPlaylistHelper(map<string, vector<pair<string,double>>>& genre, int playlistSize, double energyLevel) {
@@ -232,27 +258,50 @@ vector<string> Graph::ConstantPlaylistHelper(map<string, vector<pair<string,doub
 
 vector<string> Graph::RangePlaylistHelper(map<string, vector<pair<string,double>>>& genre, int length, double energy1, double energy2) {
     //DFS [randomly accessed]
-    string source;
+    string startSong = RandomSongHelper(map, energy1);
+    vector<pair<string, double>> playlist;
     set<string> visited;
     stack<string> s;
 
-    visited.insert(source);
-    s.push(source);
+    visited.insert(startSong);
+    s.push(startSong);
+    playlist.push_back(make_pair(s.top(), map[s.top()]));
 
-
-    while(!s.empty()){
+    while (playlist.size() != playlistSize) {
         string u = s.top();
+        if (energy1 > energy2){
+            if (map[u] < map[playlist[-1].first] && playlist.size() != 1){
+                playlist.push_back(make_pair(u, map[u]));
+            }
+        } else if (energy1 < energy2) {
+            if (map[u] > map[playlist[-1].first] && playlist.size() != 1) {
+                playlist.push_back(make_pair(u, map[u]));
+            }
+        }
         s.pop();
-        vector<string> neighbors = genre[v];
-        for(string u: neighbors){
-            if (visited.count(u) == 0){
-                visited.insert(u);
-                s.push(u);
+        vector<pair<string, double>> neighbors = graph[u];
+        for (auto it = neighbors.begin(); it != neighbors.end(); it++){
+            if ((visited.count(it->first) == 0) && (playlist.size() != playlistSize)){
+                visited.insert(it->first);
+                //string lastEntry = playlist[-1].first; // last song pushed into the playlist
+                if (energy1 > energy2){ // range is decreasing
+                    if ((map[it->first] < energy1) && (map[it->first] > energy2)){
+                        s.push(it->first);
+                        //playlist.push_back(make_pair(it->first, map[it->first]));
+                    }
+                } else if (energy1 < energy2){ // range is increasing
+                    if ((map[it->first] > energy1) && (map[it->first] < energy2)){
+                        s.push(it->first);
+                        //playlist.push_back(make_pair(it->first, map[it->first]));
+                    }
+                }
+            }
+            if (playlist.size() == playlistSize){
+                break;
             }
         }
     }
-
-
+    return playlist;
 }
 
 vector<string> Graph::CreateConstantPlaylist(string genre, int playlistSize, double energyLevel) {
