@@ -45,20 +45,13 @@ public:
     vector<pair<string, double>> RangePlaylistHelper(map<string, vector<pair<string,double>>>& graph, map<string, double>& map, int playlistSize, double energy1, double energy2);
     map<string, vector<pair<string, double>>> CheckGraph(string genre);
     map<string, double> CheckMap(string genre);
-    string RandomSongHelper(map<string, double> &genre, double energy);
+    string RandomSongHelper(map<string, double> &genre, int energy);
 };
 
 
 void Graph::ReadFile() {
     ifstream spotify;
     spotify.open("../spotify_dataset.csv", ios::in);
-
-    /*if (!spotify.is_open()){
-        cout << "Error opening file" << endl;
-    }
-    if (spotify.is_open()){
-        cout << "File is open" << endl;
-     }*/
 
     string firstLine;
     getline(spotify, firstLine);
@@ -102,14 +95,6 @@ void Graph::ReadFile() {
         }
     }
 
-    /// check why map wont print first + second next to each other
-//    for (auto& pair : pop){
-//        cout << pair.first << endl;
-//        cout << pair.second << endl;
-//        cout << pair.first << " " << pair.second << endl;
-//    }
-
-
     CreateGraph(darktrapGraph, darktrap);
     CreateGraph(undergroundrapGraph, undergroundrap);
     CreateGraph(trapmetalGraph, trapmetal);
@@ -118,34 +103,8 @@ void Graph::ReadFile() {
     CreateGraph(rnbGraph, rnb);
     CreateGraph(popGraph, pop);
     CreateGraph(hiphopGraph, hiphop);
-
-
-//    cout << darktrapGraph.size() << endl; ///
-//    cout << undergroundrapGraph.size() << endl; ///
-//    cout << emoGraph.size() << endl; ///
-//    cout << rapGraph.size() << endl; ///
-//    cout << rnbGraph.size() << endl; ///
-//    cout << trapmetalGraph.size() << endl; ///
-//    cout << popGraph.size() << endl; ///
-//    cout << hiphopGraph.size() << endl; ///
-//    for(auto it = popGraph.begin(); it != popGraph.end(); it++){
-//        cout << it->first << " ";
-//       for (auto iter = 0; iter != it->second.size(); iter++){
-//          cout << it->second[iter].first << " " << it->second[iter].second << endl;
-//        }
-//    }
-
-//    for (auto& entry : popGraph){
-//        string key = entry.first;
-//        cout << key << endl;
-//        vector<pair<string, double>> songs = entry.second;
-//        for (auto& song : songs){
-//            string songname = song.first;
-//            double energy = song.second;
-//            cout << songname << energy << endl;
-//        }
-//    }
-//    cout<< "done" << endl;
+    cout << hiphop.size() << endl;
+    cout << hiphopGraph.size() << endl;
     spotify.close();
 }
 
@@ -220,31 +179,31 @@ map<string, double> Graph::CheckMap(string genre){
     else if(genre == "Pop"){
         return pop;
     }
-    else if(genre == "Hiphop") {
-        return hiphop;
-    }
-}
-
-
-double random(double min, double max){
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_real_distribution<double> source_energy(min, max);
-    return source_energy(gen);
+    return hiphop;
 
 }
 
 // if user chooses energy level to be (whole number) x, generate a random double between x.0 and x.9
-string Graph::RandomSongHelper(map<string, double> &genre, double energy) {
-    energy = (energy - 1.0)/10.0; // changes range from 1-10 to 0.0 - 9.9 to match the dataset values
-    double min = energy;
-    double max = energy + 0.9;
+string Graph::RandomSongHelper(map<string, double> &genre, int energy) {
+    //double epsilon = 1e-10;
+    int min = 0;
+    int max = 0;
+    if (energy == 10){
+        min = 90;
+        max = 100;
+    } else {
+        energy = energy * 10; // changes energy from 3 to 30, for example
+        min = energy;
+        max = energy + 9;
+    }
+
     bool found = false;
 
     while (!found){
         double source_energy = random(min, max);
         for(auto it = genre.begin(); it != genre.end(); it++) {
-            if (it->second == source_energy) {
+            if (ceil(it->second * 100) == source_energy) {
+                //cout << "found" << endl;
                 found = true;
                 return it->first;
             }
@@ -293,7 +252,7 @@ vector<pair<string, double>> Graph::RangePlaylistHelper(map<string, vector<pair<
     s.push(startSong);
     playlist.push_back(make_pair(s.top(), map[s.top()]));
 
-    while (playlist.size() != playlistSize) {
+    while ((playlist.size() != playlistSize) && (!s.empty())) {
         string u = s.top();
         if (energy1 > energy2){
             if (map[u] < map[playlist[-1].first] && playlist.size() != 1){
