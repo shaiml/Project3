@@ -37,7 +37,7 @@ public:
     int constLevel;
     int rangeOne;
     int rangeTwo;
-    int numSongs = 16;
+    int numSongs;
 
     void setText(sf::Text &text, sf::Font &font, const string &str, unsigned int characterSize, const sf::Color &fillColor);
     void genreOutLineFunction (sf::RenderWindow& window, sf::Event event); // handles outline for genre selection

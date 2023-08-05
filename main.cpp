@@ -222,11 +222,11 @@ int main() {
             else if (event.key.code == sf::Keyboard::Enter) {
                 if (enteredNumber >= 1 && enteredNumber <= 50) {
                     text.selectedAmount = true;
-//                    text.numSongs = enteredNumber;
+                    text.numSongs = enteredNumber;
                 }
             }
         }
-        if (animationCount >= 6) {  // allow animation to run twice before window close
+        if (animationCount >= 18) {  // allow animation to run twice before window close
             window.close();
             newWindow = true;
         }
@@ -305,13 +305,34 @@ int main() {
         }
     }
 
-    vector<pair<string, double>> songTitles ({{"Wasted Times", 0.1}, {"Secrets", 0.1}, {"After Hours", 9.9}, {"Starboy", 1.0},
-                                             {"Heartless", 8.9}, {"Too Late", 2.0}, {"Hardest To Love", 8.7}, {"Escape From LA", 3.4},
-                                             {"Faith", 5.0}, {"Save Your Tears", 2.0}, {"After Hours", 0.2}, {"Call Out My Name", 2.9},
-                                             {"I Was Never There", 4.9}, {"Cruel Summer", 7.8}, {"Dawn Fm", 2.3}, {"Secrets", 4.9}});
+//    vector<pair<string, double>> songTitles ({{"Wasted Times", 0.1}, {"Secrets", 0.1}, {"After Hours", 9.9}, {"Starboy", 1.0},
+//                                             {"Heartless", 8.9}, {"Too Late", 2.0}, {"Hardest To Love", 8.7}, {"Escape From LA", 3.4},
+//                                             {"Faith", 5.0}, {"Save Your Tears", 2.0}, {"After Hours", 0.2}, {"Call Out My Name", 2.9},
+//                                             {"I Was Never There", 4.9}, {"Cruel Summer", 7.8}, {"Dawn Fm", 2.3}, {"Secrets", 4.9}});
+   */
+    Graph newPlaylist;
+
+    newPlaylist.ReadFile();
+
+    vector<pair<string, double>> myPlaylist;
+    myPlaylist = newPlaylist.CreateRangePlaylist("Hip Hop", 50, 3, 8);
+
+//    if (text.type == "Constant") {
+//        myPlaylist = newPlaylist.CreateConstantPlaylist(text.genre, text.numSongs, text.constLevel);
+//    }
+//    else {
+//        myPlaylist = newPlaylist.CreateRangePlaylist(text.genre, text.numSongs, text.rangeOne, text.rangeTwo);
+//    }
+
+
+    for (int i  = 0; i < myPlaylist.size(); i++) {
+        cout << myPlaylist[i].first<< endl;
+        cout << myPlaylist[i].second << endl;
+    }
+/*
     int increase = 10;
     int track = 0;
-    for (auto pair : songTitles) {
+    for (auto pair : myPlaylist) {
         sf::Text songText;
         sf::Text energyText;
         songText.setString(pair.first);
@@ -321,7 +342,7 @@ int main() {
         oss << fixed << setprecision(1) << pair.second;
         string level = oss.str();
 
-        text.setText(songText, otherPixel, pair.first, 40, sf::Color::Black);
+        text.setText(songText, semiBold, pair.first, 40, sf::Color::Black);
         text.setText(energyText, semiBold, level, 40, sf::Color::Black);
 
         oss.str("");
@@ -356,7 +377,7 @@ int main() {
     energyText.setStyle(sf::Text::Bold);
     energyText.setPosition(width / 2.0f + 275, height / 9.0f - 80);
 
-    if (newWindow) {
+    /*if (newWindow) {
         sf::RenderWindow resultWindow(sf::VideoMode(width, height), "Beat Builders");
         while (resultWindow.isOpen()) {
             sf::Event event;
@@ -372,6 +393,6 @@ int main() {
             text.buttonsFunction(resultWindow, event);
             resultWindow.display();
         }
-    }
+    }*/
     return 0;
 }
