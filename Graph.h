@@ -147,7 +147,8 @@ map<string, vector<pair<string, double>>> Graph ::CheckGraph(string genre){
         CreateGraph(popGraph, pop);
         return popGraph;
     }
-    else if(genre == "Hiphop") {
+    else if(genre == "Hip Hop"){
+        CreateGraph(hiphopGraph, hiphop);
         return hiphopGraph;
     }
 }
@@ -194,19 +195,23 @@ string Graph::RandomSongHelper(map<string, double> &genre, int energy) {
 
     bool found = false;
 
-    while (!found){
-        double source_energy = random(min, max);
+    while (!found){;
+        double source_energy = (rand() % (max - min + 1)) + min;
         for(auto it = genre.begin(); it != genre.end(); it++) {
             if (ceil(it->second * 100) == source_energy) {
                 //cout << "found" << endl;
                 found = true;
                 return it->first;
             }
+            else{
+                //cout << "not found" << endl;
+            }
         }
     }
+    cout << "done" << endl;
 }
 
-vector<pair<string, double>> Graph::ConstantPlaylistHelper(map<string, vector<pair<string,double>>>& graph, map<string, double>& map, int playlistSize, double energy) {
+vector<pair<string, double>> Graph::ConstantPlaylistHelper(map<string, vector<pair<string,double>>>& graph, map<string, double>& map, int playlistSize, int energy) {
     //BFS
     string startSong = RandomSongHelper(map, energy); //find random song that matches energy level
     vector<pair<string, double>> playlist; // initiate playlist of songs
@@ -337,7 +342,7 @@ vector<pair<string, double>> Graph::RangePlaylistHelper(map<string, vector<pair<
     return playlist;
 }
 
-vector<pair<string, double>> Graph::CreateConstantPlaylist(string genre, int playlistSize, double energy) {
+vector<pair<string, double>> Graph::CreateConstantPlaylist(string genre, int playlistSize, int energy) {
     map<string, vector<pair<string,double>>> genreGraph = CheckGraph(genre);
     map<string, double> genreMap = CheckMap(genre);
     return ConstantPlaylistHelper(genreGraph, genreMap, playlistSize, energy);
