@@ -3,11 +3,13 @@
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "Graph.h"
 #include "textures.h"
 #include "visuals.h"
 using namespace std;
 
 int main() {
+/*
     Text text;
     ostringstream oss;
     float width = 1500;
