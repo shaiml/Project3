@@ -1,15 +1,13 @@
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "Graph.h"
 #include "textures.h"
 #include "visuals.h"
+#include "Graph.h"
 using namespace std;
 
 int main() {
-/*
     Text text;
     ostringstream oss;
     float width = 1500;
@@ -19,10 +17,12 @@ int main() {
     sf::Font pixel;
     sf::Font semiBold;
     sf::Font otherPixel;
+    sf::Font font;
 
     pixel.loadFromFile("files/VPPixel-Simplified.otf");
     semiBold.loadFromFile("files/Panton-Trial-SemiBold.ttf");
     otherPixel.loadFromFile("files/Big Pixel demo.otf");
+    font.loadFromFile("files/Moreday.ttf");
 
     sf::Sprite headphones;
     headphones.setScale(.20f, .20f);
@@ -55,7 +55,7 @@ int main() {
     darkTrap.setPosition(width / 9.0f - 50, height / 5.0f + 10);
     text.genreTextBoxes.push_back(darkTrap);
 
-    text.setText(hipHop, otherPixel, "Hip-Hop", 40, sf::Color::Black);
+    text.setText(hipHop, otherPixel, "Hip Hop", 40, sf::Color::Black);
     hipHop.setPosition(width / 3.0f, height / 5.0f + 10);
     text.genreTextBoxes.push_back(hipHop);
 
@@ -71,11 +71,11 @@ int main() {
     rap.setPosition(width / 9.0f - 50, height / 4.0f + 20);
     text.genreTextBoxes.push_back(rap);
 
-    text.setText(underGround, otherPixel, "Underground", 40, sf::Color::Black);
-    underGround.setPosition(width / 3.0f - 50, height / 4.0f + 20);
+    text.setText(underGround, otherPixel, "Underground Rap", 40, sf::Color::Black);
+    underGround.setPosition(width / 3.0f - 100, height / 4.0f + 20);
     text.genreTextBoxes.push_back(underGround);
 
-    text.setText(rnb, otherPixel, "RNB", 40, sf::Color::Black);
+    text.setText(rnb, otherPixel, "RnB", 40, sf::Color::Black);
     rnb.setPosition(width / 2.0f + 125, height / 4.0f + 20);
     text.genreTextBoxes.push_back(rnb);
 
@@ -226,7 +226,7 @@ int main() {
                 }
             }
         }
-        if (animationCount >= 18) {  // allow animation to run twice before window close
+        if (animationCount >= 6) {  // allow animation to run twice before window close
             window.close();
             newWindow = true;
         }
@@ -305,34 +305,33 @@ int main() {
         }
     }
 
-//    vector<pair<string, double>> songTitles ({{"Wasted Times", 0.1}, {"Secrets", 0.1}, {"After Hours", 9.9}, {"Starboy", 1.0},
-//                                             {"Heartless", 8.9}, {"Too Late", 2.0}, {"Hardest To Love", 8.7}, {"Escape From LA", 3.4},
-//                                             {"Faith", 5.0}, {"Save Your Tears", 2.0}, {"After Hours", 0.2}, {"Call Out My Name", 2.9},
-//                                             {"I Was Never There", 4.9}, {"Cruel Summer", 7.8}, {"Dawn Fm", 2.3}, {"Secrets", 4.9}});
-   */
-    Graph newPlaylist;
-
-    newPlaylist.ReadFile();
-
-    vector<pair<string, double>> myPlaylist;
-    myPlaylist = newPlaylist.CreateRangePlaylist("Hip Hop", 50, 3, 8);
-
-//    if (text.type == "Constant") {
-//        myPlaylist = newPlaylist.CreateConstantPlaylist(text.genre, text.numSongs, text.constLevel);
-//    }
-//    else {
-//        myPlaylist = newPlaylist.CreateRangePlaylist(text.genre, text.numSongs, text.rangeOne, text.rangeTwo);
-//    }
+    Graph graph;
+    graph.ReadFile();
+    vector<pair<string, float>> playlist;
 
 
-    for (int i  = 0; i < myPlaylist.size(); i++) {
-        cout << myPlaylist[i].first<< endl;
-        cout << myPlaylist[i].second << endl;
+    if (text.type == "Constant") {
+        playlist = graph.CreateConstantPlaylist(text.genre, text.numSongs, text.constLevel);
     }
-/*
+    else {
+        playlist = graph.CreateRangePlaylist(text.genre, text.numSongs,  text.rangeOne, text.rangeTwo);
+    }
+
+    //  sort the playlist
+    sort(playlist.begin(), playlist.end(), [](const auto& a, const auto& b) {
+        return a.second < b.second;
+    });
+
+    for (auto val: playlist) {
+        cout << val.first << " ";
+        cout << val.second << endl;
+    }
+    cout << playlist.size() << endl;
+
+
     int increase = 10;
     int track = 0;
-    for (auto pair : myPlaylist) {
+    for (auto pair : playlist) {
         sf::Text songText;
         sf::Text energyText;
         songText.setString(pair.first);
@@ -342,7 +341,7 @@ int main() {
         oss << fixed << setprecision(1) << pair.second;
         string level = oss.str();
 
-        text.setText(songText, semiBold, pair.first, 40, sf::Color::Black);
+        text.setText(songText, font, pair.first, 40, sf::Color::Black);
         text.setText(energyText, semiBold, level, 40, sf::Color::Black);
 
         oss.str("");
@@ -377,7 +376,7 @@ int main() {
     energyText.setStyle(sf::Text::Bold);
     energyText.setPosition(width / 2.0f + 275, height / 9.0f - 80);
 
-    /*if (newWindow) {
+    if (newWindow) {
         sf::RenderWindow resultWindow(sf::VideoMode(width, height), "Beat Builders");
         while (resultWindow.isOpen()) {
             sf::Event event;
@@ -393,6 +392,6 @@ int main() {
             text.buttonsFunction(resultWindow, event);
             resultWindow.display();
         }
-    }*/
+    }
     return 0;
 }

@@ -2,8 +2,31 @@
 #include "textures.h"
 
 void Text::setText(sf::Text &text, sf::Font &font, const string &str, unsigned int characterSize, const sf::Color &fillColor) {
+    stringstream iss(str);
+    vector<string> words;
+
+    string word;
+    while (iss >> word) {
+        words.push_back(word);
+    }
+    string result;
+    int currLength = 0;
+
+    for (const auto& w : words) {  // limit string length for display
+        if (currLength + w.length() + 1 <= 60) {
+            result += w + " ";
+            currLength += w.length() + 1;
+        } else {
+            break;
+        }
+    }
+
+    if (!result.empty()) {  // remove trailing space
+        result.pop_back();
+    }
+
     text.setFont(font);
-    text.setString(str);
+    text.setString(result);
     text.setCharacterSize(characterSize);
     text.setFillColor(fillColor);
 }

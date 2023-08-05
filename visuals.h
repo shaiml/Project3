@@ -32,8 +32,8 @@ public:
     bool selectedScaleTwo = false;
     bool selectedAmount = false;
 
-    string genre = "";
-    string type = "";
+    string genre;
+    string type;
     int constLevel;
     int rangeOne;
     int rangeTwo;
