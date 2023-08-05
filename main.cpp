@@ -322,13 +322,6 @@ int main() {
         return a.second < b.second;
     });
 
-    for (auto val: playlist) {
-        cout << val.first << " ";
-        cout << val.second << endl;
-    }
-    cout << playlist.size() << endl;
-
-
     int increase = 10;
     int track = 0;
     for (auto pair : playlist) {
