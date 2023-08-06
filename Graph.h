@@ -253,7 +253,7 @@ vector<pair<string, float>> Graph::RangePlaylistHelper(map<string, vector<pair<s
     // DFS
     while((playlist.size() != playlistSize) && !s.empty()) {
         string u = s.top();
-        if ((u != startSong) && visitedVal.count(map[u] * 10.0) == 0){ // skips re-entering the source node and any energy levels already in the graph
+        if ((u != startSong) && visitedVal.count(map[u] * 10.0) == 0){ // skips re-entering the source node and any energy levels already in the playlist
             visitedVal.insert(map[u] * 10.0);
             playlist.emplace_back(u, (map[u] * 10.0));
         }
